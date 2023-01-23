@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+		<meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+        <meta name="color-scheme" content="light dark">
+        <title>Radio</title>
+		<style type="text/css">
+html,body{margin:0; padding:0; height:100%; background-color:#020202;}
+#wrapper{display:flex; flex-direction: column; height:100%;}
+
+#header{
+	color:white;
+	font-size:18px;
+	background-color:#4f4f4f;
+	background:linear-gradient(180deg, #4f4f4f 0%, #191919 100%);
+	padding:20px;
+	display:flex;
+	justify-content:center;
+	align-content:center;
+	border-top:1px solid #777777;
+	border-bottom:2px solid #2a2a2a;
+	min-height:22px;
+	text-align:center;
+}
+
+#cover{
+	display:flex;
+	flex-direction:column;
+	justify-content:space-between;
+	flex: 1 0 auto;
+	background-image:url(img/cover.png);
+	background-position:top center;
+	background-size:cover;
+	text-align:center;
+	color:white;
+	font-size:16px;
+}
+
+#controls{
+	background-color:#4f4f4f;
+	background: linear-gradient(180deg, #4f4f4f 0%, #191919 100%);
+	padding:20px;
+	flex: 0 0 auto;
+	border-top:2px solid #777777;
+	border-top-right-radius: 15px;
+	border-top-left-radius: 15px;
+}
+
+#buttons{display:flex; justify-content:center; align-content:center; padding-bottom:20px;}
+
+#play,#stop{background-image:url(img/btn.png); background-position:left; width:40px; height:44px; background-size:200% 100%;}
+#stop{background-position:right;}
+
+#mute,#unmute{background-image:url(img/btn2.png); background-position:left center; width:30px; height:34px; margin:0px 5px 0 5px; background-size:200% 100%; background-repeat:no-repeat;}
+#unmute{background-position:right;}
+
+#btn-clear{width:30px; height:34px; margin:0px 0 5px 5px;}
+
+#sub-buttons{display:flex; justify-content:space-between; align-items:center; height:60px;}
+
+input[type=range] {
+  height: 34px;
+  -webkit-appearance: none;
+  margin: 10px 0;
+  width: 100%;
+  background: transparent;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 11px;
+  cursor: pointer;
+  animate: 0.2s;
+  box-shadow: 1px 1px 1px #000000;
+  background: #ababab;
+  border-radius: 1px;
+  border: 0px solid #010101;
+  border-radius:5px;
+}
+input[type=range]::-webkit-slider-thumb {
+  border: 1px solid #00001E;
+  height: 26px;
+  width: 26px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #d1d1d1 0%, #818181 100%);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -8px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #ababab;
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 11px;
+  cursor: pointer;
+  animate: 0.2s;
+  box-shadow: 1px 1px 1px #000000;
+  background: #ababab;
+  border-radius: 1px;
+  border: 0px solid #010101;
+  border-radius:5px;
+}
+input[type=range]::-moz-range-thumb {
+  border: 1px solid #00001E;
+  height: 26px;
+  width: 26px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #d1d1d1 0%, #818181 100%);
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 11px;
+  cursor: pointer;
+  animate: 0.2s;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  background: #74A9D8;
+  border: 0px solid #010101;
+  border-radius: 2px;
+  box-shadow: 1px 1px 1px #000000;
+}
+input[type=range]::-ms-fill-upper {
+  background: #74A9D8;
+  border: 0px solid #010101;
+  border-radius: 2px;
+  box-shadow: 1px 1px 1px #000000;
+}
+input[type=range]::-ms-thumb {
+  margin-top: 1px;
+  box-shadow: 1px 1px 1px #000031;
+  border: 1px solid #00001E;
+  height: 26px;
+  width: 26px;
+  border-radius: 15px;
+  background: #FFFFFF;
+  cursor: pointer;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: #74A9D8;
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: #74A9D8;
+}
+
+</style>
+-
+<script type="text/javascript">
+var Play = false;
+var Mute = false;
+var Radio;
+function playStop(){
+	if (Play == true) {
+		document.getElementById('stop').setAttribute('id', 'play');
+		Play = false;
+		document.getElementById('radio').pause();
+		document.getElementById('radio').currentTime = 0;
+		document.getElementById('radio').src = document.getElementById('radio').src; //сброс кеша
+	}
+	else {
+		document.getElementById('play').setAttribute('id', 'stop');
+		Play = true;
+		document.getElementById('radio').play();
+		updateCurrengSong();
+	}
+}
+
+function muteUnmute(){
+	if (Mute == true) {
+		document.getElementById('unmute').setAttribute('id', 'mute');
+		Mute = false;
+		document.getElementById('radio').volume = document.getElementById('volume').value / 100;
+			//document.getElementById('radio').pause();
+			//document.getElementById('radio').currentTime = 0;
+	}
+	else {
+		document.getElementById('mute').setAttribute('id', 'unmute');
+		Mute = true;
+		document.getElementById('radio').volume = 0;
+	}
+}
+
+function changeVolume(em){
+	document.getElementById('radio').volume = em.value / 100;
+	if (Mute == true) {	
+		document.getElementById('unmute').setAttribute('id', 'mute');
+		Mute = false;
+	}
+}
+
+function GetData(URL){
+	return new Promise(function(resolve, reject) {
+		let request = new XMLHttpRequest();
+		request.open('GET', URL, true);
+		
+		request.onload = function() {
+			if	(request.status == 200)
+				resolve(request.responseText);
+			else
+				reject();
+		}
+		
+		request.onerror = function() {
+			reject();
+		};
+		
+		request.send();
+	});
+}
+
+function updateCurrengSong(){
+	GetData('https://myradio24.com/users/9316/status.json?d=' + new Date().getTime()).then(function(responseText) {
+		
+		const JsonObj = JSON.parse(responseText);
+		songName = JsonObj['song'];
+		if (songName.trim() == '') songName = 'Неизвестный трек';
+		document.getElementById('header').innerHTML = songName;
+	}).catch(function() {
+		document.getElementById('header').innerHTML = 'Не удалось получить';
+	});
+}
+
+setInterval(function(){
+	updateCurrengSong();
+}, 5000);
+
+document.addEventListener("DOMContentLoaded", function(){
+	updateCurrengSong();
+});
+</script>
+    </head>
+    <body>
+<div id="wrapper">
+	<div id="header">
+		<div id="current-song"></div>
+	</div>
+	<div id="cover">
+		<div style="padding:24px;">Вещает: SDD Live Radio Non Stop</div>
+		<div style="padding:24px;">www.sddradio.eu</div>
+	</div>
+	<div id="controls">
+		<div id="buttons">
+			<div id="play" onclick="playStop()"></div>
+		</div>
+		<div id="sub-buttons">
+			<div id="mute" onclick="muteUnmute()"></div>
+			<input onchange="changeVolume(this)" style="width:calc(100% - 85px);" type="range" min="1" max="100" value="100" id="volume">
+			<div id="btn-clear" onclick=""></div>
+		</div>
+	</div>
+</div>
+<audio id="radio" src="https://listen7.myradio24.com/9316" preload="none">
+    </body>
+</html>
